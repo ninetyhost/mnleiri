@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Festarileiri – Ohjelma</title>
+  <meta name="color-scheme" content="light dark">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #111827; /* slate-900 */
+      --muted: #6b7280; /* gray-500 */
+      --card: #f8fafc; /* slate-50 */
+      --accent: #2563eb; /* blue-600 */
+      --accent-contrast: #ffffff;
+      --border: #e5e7eb; /* gray-200 */
+      --shadow: 0 2px 10px rgba(0,0,0,.06);
+    }
+    [data-theme="dark"] {
+      --bg: #0b1220;
+      --fg: #e5e7eb;
+      --muted: #9ca3af;
+      --card: #0f172a; /* slate-900 */
+      --accent: #60a5fa; /* blue-400 */
+      --accent-contrast: #0b1220;
+      --border: #1f2937;
+      --shadow: 0 2px 12px rgba(0,0,0,.35);
+    }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: var(--bg);
+      color: var(--fg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Header */
+    .appbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--bg);
+      backdrop-filter: saturate(1.3) blur(6px);
+      border-bottom: 1px solid var(--border);
+    }
+    .appbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: .75rem 1rem;
+      gap: .75rem;
+    }
+    .title {
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      font-size: 1.05rem;
+    }
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      border: 1px solid var(--border);
+      background: var(--card);
+      padding: .4rem .6rem;
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      color: var(--fg);
+      cursor: pointer;
+      user-select: none;
+      font-size: .9rem;
+    }
+    .theme-toggle input { display: none; }
+
+    /* Tabs */
+    .tabs {
+      position: sticky;
+      top: 54px; /* sticks below appbar */
+      z-index: 999;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .tabs-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: .25rem;
+      padding: .25rem .25rem;
+    }
+    .tab-btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--fg);
+      padding: .6rem .4rem;
+      border-radius: .6rem;
+      font-weight: 600;
+      font-size: .9rem;
+      text-align: center;
+      cursor: pointer;
+      transition: transform .05s ease, background .2s ease, border-color .2s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tab-btn:active { transform: scale(0.98); }
+    .tab-btn.active {
+      background: var(--accent);
+      color: var(--accent-contrast);
+      border-color: transparent;
+    }
+
+    /* Layout */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* Cards */
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: .9rem;
+    }
+    @media (min-width: 640px) {
+      .cards { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 960px) {
+      .cards { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: .9rem;
+      padding: 1rem;
+      box-shadow: var(--shadow);
+    }
+    .when { color: var(--muted); font-size: .92rem; margin-bottom: .35rem; }
+    .title-lg { font-size: 1.05rem; font-weight: 700; margin: 0 0 .25rem 0; }
+    .desc { margin: .35rem 0 0 0; line-height: 1.5; }
+
+    .tag {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .3px;
+      padding: .2rem .5rem;
+      border-radius: .5rem;
+      background: rgba(37, 99, 235, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(37,99,235,0.25);
+      margin-right: .4rem;
+    }
+
+    /* Accessibility helpers */
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,1px,1px); white-space: nowrap; border: 0; }
+
+    /* Footer spacing */
+    .spacer { height: 24vh; }
+  </style>
+</head>
+<body>
+  <header class="appbar" role="banner">
+    <div class="appbar-inner">
+      <div class="title">Festarileiri – Ohjelma</div>
+      <label class="theme-toggle" id="themeToggle" aria-label="Vaihda teema">
+        <input type="checkbox" id="themeCheckbox" />
+        <span aria-hidden="true">🌞 / 🌙</span>
+        <span>Teema</span>
+      </label>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Päivät ja osiot">
+    <div class="tabs-inner">
+      <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-perjantai" id="btn-perjantai">Perjantai</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-lauantai" id="btn-lauantai">Lauantai</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-sunnuntai" id="btn-sunnuntai">Sunnuntai</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-studiot" id="btn-studiot">Studiot</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-workshopit" id="btn-workshopit">Workshopit</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-esiintyjat" id="btn-esiintyjat">Esiintyjät</button>
+    </div>
+  </nav>
+
+  <main class="container">
+    <!-- PERJANTAI -->
+    <section class="section active" id="tab-perjantai" role="tabpanel" aria-labelledby="btn-perjantai">
+      <h2 class="sr-only">Perjantai 6.3.</h2>
+      <div class="cards">
+        <article class="card">
+          <div class="when">16.00</div>
+          <h3 class="title-lg">Ilmoittautuminen ja majoittuminen</h3>
+        </article>
+        <article class="card">
+          <div class="when">17.00–18.00</div>
+          <h3 class="title-lg">Päivällinen</h3>
+        </article>
+        <article class="card">
+          <div class="when">18.15</div>
+          <h3 class="title-lg">Isolla vaiheella valoa kohti</h3>
+          <p class="desc">Hetki sitten tarvoimme arjen pimeydessä eri puolilla maata. Nyt näemme jo paremmin, kun kokoonnumme yhteen voimistuva valo kädessämme. Yhteisissä avajaisissa tutustutaan toisiimme ja ikiomaan festarileirin meininkiin. Mukana houseband, festariväki ja juontajat.</p>
+        </article>
+        <article class="card">
+          <div class="when">19.15</div>
+          <h3 class="title-lg">Tuutin täydeltä hyviä uutisia</h3>
+          <p class="desc">Ensimmäinen iltamme jatkuu isosti, kun junat ovat löytäneet asemalle ja autot on parkkeerattu pihalle hienosti riviin. Moikataan tutut ja uudet tuttavat sekä noustaan sekunnissa seitsemään sataan kiihtyvään Maata Näkyvissä -festarijunaan. Mukana houseband, festariväki, festarivideot ja tietysti yhteistä tutustumista. Nuoren puheenvuoron pitää Elisa Suopajärvi. Raamattuopetus 1: Jumalan järjestämä pelastusvene informaatiotulvan aallokossa – Antti Koskenniemi.</p>
+        </article>
+        <article class="card">
+          <div class="when">20.30–21.00</div>
+          <h3 class="title-lg">Iltapala</h3>
+        </article>
+        <article class="card">
+          <div class="when">21.15</div>
+          <h3 class="title-lg">Ihmeitä ja tähtiä: who is Amos!</h3>
+          <p class="desc">Perjantai-illan festarileirihuumaa tarjoilee suosittu ja palkittu räppitähti Amos.</p>
+        </article>
+        <article class="card">
+          <div class="when">22.30</div>
+          <h3 class="title-lg">Hän on uskollinen Jumala</h3>
+          <p class="desc">Festarileirin väki laulaa, ylistää ja hiljentyy parhaaseen paikkaan, ehtoollispöytään. Juodaan kuolemattomuuden maljasta luottaen Häneen, jonka rakkaus on täydellinen ja joka on uskollinen. Iltamessussa Johan Helkkula ja Markus Malmivaara, musiikissa Riina Halme.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- LAUANTAI -->
+    <section class="section" id="tab-lauantai" role="tabpanel" aria-labelledby="btn-lauantai">
+      <h2 class="sr-only">Lauantai 7.3.</h2>
+      <div class="cards">
+        <article class="card">
+          <div class="when">8.00</div>
+          <h3 class="title-lg">Aamupala</h3>
+        </article>
+        <article class="card">
+          <div class="when">9.00</div>
+          <h3 class="title-lg">Valot pimeyksien reunalla</h3>
+          <p class="desc">Pitkän viikon jälkeen heräät lauantaina uuteen aamuun tukka, sielu ja sydän sekaisin ja joku jaksaa ihan vieressä laulaa ”joka aamu on armo uus.” Neljä kirjainta tuo toivon ja valon. Maailman parhaan lauantaiaamun ensimmäisissä henkäyksissä sun kanssa houseband ja festariväki. Aamunhartaus Milka Ikäläinen ja nuoren puheenvuoro Emma Palola. Raamattuopetus 2: Kuinka reunalla uskallan olla ja nojata tuuleen? – Päivi Niemi.</p>
+        </article>
+        <article class="card">
+          <div class="when">10.45</div>
+          <h3 class="title-lg">Workshopit</h3>
+        </article>
+        <article class="card">
+          <div class="when">11.30–12.30</div>
+          <h3 class="title-lg">Lounas</h3>
+        </article>
+        <article class="card">
+          <div class="when">12.45</div>
+          <h3 class="title-lg">Keskipäivän kotibileet</h3>
+          <p class="desc">Tänään ei ole vaan vanha jengi koolla, vaan nyt haetaan yhteys, ilo ja rauha sellaisesta seurasta, johon ei koskaan joudu pettymään. Keskipäivän isoissa bileissä musiikista vastaa Pro Fide ja raamattuopetus 3: Mitä Jeesuksen seurassa kulkeminen antaa ja ottaa? – Tiina Karlsson.</p>
+        </article>
+        <article class="card">
+          <div class="when">14.00</div>
+          <h3 class="title-lg">Kahvit ja mehut</h3>
+        </article>
+        <article class="card">
+          <div class="when">14.30</div>
+          <h3 class="title-lg">Studioinfot</h3>
+        </article>
+        <article class="card">
+          <div class="when">14.40</div>
+          <h3 class="title-lg">Studiot</h3>
+        </article>
+        <article class="card">
+          <div class="when">16.00</div>
+          <h3 class="title-lg">Ihan pihalla – superspesiaali</h3>
+        </article>
+        <article class="card">
+          <div class="when">17.00–18.00</div>
+          <h3 class="title-lg">Päivällinen</h3>
+        </article>
+        <article class="card">
+          <div class="when">18.00</div>
+          <h3 class="title-lg">Open stage</h3>
+          <p class="desc">Lauantai-illan pimentyessä yleisö on lämmitelty ja lava on sinun. Tule ja tuo omat talentit yhteiseen käyttöön. Avoin lava on valmiina esittelemään erilaisia ja erityisiä esiintyjiä. Tartu tilaisuuteen ja ota yleisö haltuun.</p>
+        </article>
+        <article class="card">
+          <div class="when">19.30</div>
+          <h3 class="title-lg">Tarinoita tulipunaisesta taivaanrannasta</h3>
+          <p class="desc">Tänään ei jämähdetä taivaanrannan maalareiksi, vaan eletään hetkessä kuunnellen toisiamme ja katsellen, mitä tulevaisuus taivaanrannan takaa meille tuo. Lauantain iltagaalan meiningeissä ihmetellään festaridokkaria, kuullaan parhaat jutut, sketsit ja ihastellaan workshoppien satoa. Nuorten puheenvuoron pitää Veikko Pulakka. Raamattuopetus 4: Miten paljon huomista pitää pelätä? – Juha Heinonen.</p>
+        </article>
+        <article class="card">
+          <div class="when">20.30</div>
+          <h3 class="title-lg">Iltapala</h3>
+        </article>
+        <article class="card">
+          <div class="when">21.30</div>
+          <h3 class="title-lg">Kuinka paljon voi kestää</h3>
+          <p class="desc">Kuuluuko ananas pizzaan, on ymmärrettävä väittelyn aihe. Rokkimeiningillä operoiva Kotipalaajat taas kuuluu festarileirin iltagaalaan ilman vastaväitteitä. Mukana myös stand-uppia Teemu Kalliolta.</p>
+        </article>
+        <article class="card">
+          <div class="when">23.00</div>
+          <h3 class="title-lg">Minä olen sinun kanssasi</h3>
+          <p class="desc">Täydessä salissa ihmisjoukon keskellä joku näkee ja kuulee sinut. Kuulee hiljaiset huokaukset ja ajatuksesi. Hän on mukana myös ilon kiljahduksissa, mutta nyt on aika hiljentyä pitkän päivän päälle. Iltahartaudessa Minttu Gummerus ja houseband.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- SUNNUNTAI -->
+    <section class="section" id="tab-sunnuntai" role="tabpanel" aria-labelledby="btn-sunnuntai">
+      <h2 class="sr-only">Sunnuntai 8.3.</h2>
+      <div class="cards">
+        <article class="card">
+          <div class="when">8.30</div>
+          <h3 class="title-lg">Aamupala</h3>
+        </article>
+        <article class="card">
+          <div class="when">9.15</div>
+          <h3 class="title-lg">Tuhansien tuntemusten taukopaikka</h3>
+          <p class="desc">Sunnuntaiaamun rauha tai rauhattomuus, mutta uusi mahdollisuus etsiä, löytää ja nähdä, mitä sisällämme ja ihan vieressä tapahtuu. Aamusessioissa mukana houseband, aamuhartaudessa Maleena Savolainen, nuoren puheenvuorossa Joel Aalto ja musiikissa kanteletaiteilija Sanni Rusama.</p>
+        </article>
+        <article class="card">
+          <div class="when">11.00</div>
+          <h3 class="title-lg">Rakkaus tulee kylään</h3>
+          <p class="desc">Sunnuntain jumalanpalveluksessa väsynyt, mutta onnellinen seurakunta kokoontuu yhteen ja antaa Pyhän Hengen hoitaa uskoamme ihmeellisellä tavalla. Ehtoollismessussa saarnaa Samuli Luomaranta ja liturgina Markus Malmivaara.</p>
+        </article>
+        <article class="card">
+          <div class="when">12.30</div>
+          <h3 class="title-lg">Lounas</h3>
+        </article>
+        <article class="card">
+          <div class="when">13.15</div>
+          <h3 class="title-lg">Yksi ei hylkää, yksi ei unohda</h3>
+          <p class="desc">Festarileirin kirpparilla liikutaan viimeistä kertaa sydämen ostoskori auki. Kotimatkaa miettiessä voi tulla jo mutkia matkaan, mutta onneksi matkanjohtaja tietää reittimme ja saamme jatkaa valmistetussa askeleissa. Festarileirin finaalissa Suomen paras Papipike, houseband, viimeiset fiilikset ja infot sekä raamattuopetus 5: Ihminen eksyy ja unohtaa, mutta entä Jumala – Eetu Airevuo.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- STUDIOT -->
+    <section class="section" id="tab-studiot" role="tabpanel" aria-labelledby="btn-studiot">
+      <h2 class="sr-only">Studiot</h2>
+      <div class="cards">
+        <article class="card">
+          <span class="tag">Studio</span>
+          <h3 class="title-lg">Kipua, iloa ja sateisia päiviä, elämää Jeesuksen seurassa — Tiina Karlsson</h3>
+          <p class="desc">Kristityn elämän tuntemuksia ja tilanteita. Mitä elämä Jeesuksen kanssa antaa? Syventävä jatko iltapäivän opetukselle.</p>
+        </article>
+        <article class="card">
+          <span class="tag">Studio</span>
+          <h3 class="title-lg">Hei beibi, mä oon sekaisin — Heli Orre</h3>
+          <p class="desc">Mistä löytyy aito apu, ilo, rauha ja hyväksyntä, kun suuntaviivat häviävät ja elämän perusta on hukassa?</p>
+        </article>
+        <article class="card">
+          <span class="tag">Studio</span>
+          <h3 class="title-lg">Pitääkö armoa suorittaa? — Antti Koskenniemi</h3>
+          <p class="desc">Suorittamisen kulttuuri vs. armo. Voiko armo todella olla ilmaista? Puhetta ja pohdintaa armosta.</p>
+        </article>
+        <article class="card">
+          <span class="tag">Studio</span>
+          <h3 class="title-lg">Mission possible – mahdollinen tehtävä — Heini Lehtimäki</h3>
+          <p class="desc">Jeesuksen lähetyskäsky tänään: mitä lähetystyö voi olla ja millainen apu on matkassa?</p>
+        </article>
+        <article class="card">
+          <span class="tag">Studio</span>
+          <h3 class="title-lg">Voiko Jumala unohtaa minut? — Johan Helkkula</h3>
+          <p class="desc">Miksi rakastava Jumala ei vie kaikkia taivaaseen? Pohdintaa Jumalan uskollisuudesta ja kelpaamisen kysymyksistä.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- WORKSHOPIT -->
+    <section class="section" id="tab-workshopit" role="tabpanel" aria-labelledby="btn-workshopit">
+      <h2 class="sr-only">Workshopit</h2>
+      <div class="cards">
+        <article class="card">
+          <span class="tag">Workshop</span>
+          <h3 class="title-lg">Draama — ohjaus: Heli Orre</h3>
+          <p class="desc">Mistä draamassa on kyse? Otetaan lava ja yleisö haltuun pienen opastuksen avulla ja valmistellaan sketsejä lauantai-illan gaalaan.</p>
+        </article>
+        <article class="card">
+          <span class="tag">Workshop</span>
+          <h3 class="title-lg">Musa — ohjaus: Pietari Savolainen &amp; houseband</h3>
+          <p class="desc">Haluaisitko soittaa bändissä ja palvella musiikin keinoin ainakin kerran? Vinkkejä bändisoittoon ja yhdessä musisointia.</p>
+        </article>
+        <article class="card">
+          <span class="tag">Workshop</span>
+          <h3 class="title-lg">Sportti — ohjaus: Wille Gummerus</h3>
+          <p class="desc">Liike on lääke. Ylös ja pelikentälle – nautitaan hyvästä seurasta ja pelin ilosta.</p>
+        </article>
+        <article class="card">
+          <span class="tag">Workshop</span>
+          <h3 class="title-lg">Tanssi — ohjaus: Emilia &amp; Anna‑Sofia Rahja</h3>
+          <p class="desc">Toteutetaan itseä hyvässä ohjauksessa, luodaan toimiva koreografia ja ohjelmanumero illan gaalaan.</p>
+        </article>
+        <article class="card">
+          <span class="tag">Workshop</span>
+          <h3 class="title-lg">Kuvataide — ohjaus: Julia “Julle” Immonen</h3>
+          <p class="desc">Rauhoitutaan taiteen äärelle ja annetaan luovuudelle siivet – tehdään jotain hienoa yhdessä.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ESIINTYJÄT -->
+    <section class="section" id="tab-esiintyjat" role="tabpanel" aria-labelledby="btn-esiintyjat">
+      <h2 class="sr-only">Esiintyjät</h2>
+      <div class="cards">
+        <article class="card">
+          <h3 class="title-lg">Antti Koskenniemi</h3>
+          <div class="when">Pe 19.15</div>
+          <p class="desc">Raamattuopetus 1: Jumalan järjestämä pelastusvene informaatiotulvan aallokossa.</p>
+        </article>
+        <article class="card">
+          <h3 class="title-lg">Amos</h3>
+          <div class="when">Pe 21.15</div>
+          <p class="desc">Räppiä ja festarileirihuumaa perjantai-iltana.</p>
+        </article>
+        <article class="card">
+          <h3 class="title-lg">Päivi Niemi</h3>
+          <div class="when">La 9.00</div>
+          <p class="desc">Raamattuopetus 2: Kuinka reunalla uskallan olla ja nojata tuuleen?</p>
+        </article>
+        <article class="card">
+          <h3 class="title-lg">Tiina Karlsson</h3>
+          <div class="when">La 12.45</div>
+          <p class="desc">Raamattuopetus 3: Mitä Jeesuksen seurassa kulkeminen antaa ja ottaa?</p>
+        </article>
+        <article class="card">
+          <h3 class="title-lg">Pro Fide</h3>
+          <div class="when">La 12.45</div>
+          <p class="desc">Musiikki: Keski­päivän kotibileiden meininki.</p>
+        </article>
+        <article class="card">
+          <h3 class="title-lg">Open Stage</h3>
+          <div class="when">La 18.00</div>
+          <p class="desc">Avoin lava – yleisö on lämmitelty ja lava on sinun.</p>
+        </article>
+        <article class="card">
+          <h3 class="title-lg">Juha Heinonen</h3>
+          <div class="when">La 19.30</div>
+          <p class="desc">Raamattuopetus 4: Miten paljon huomista pitää pelätä?</p>
+        </article>
+        <article class="card">
+          <h3 class="title-lg">Kotipalaajat</h3>
+          <div class="when">La 21.30</div>
+          <p class="desc">Rokkimeininkiä lauantain iltagaalassa.</p>
+        </article>
+        <article class="card">
+          <h3 class="title-lg">Teemu Kallio</h3>
+          <div class="when">La 21.30</div>
+          <p class="desc">Stand up -komiikkaa iltagaalaan.</p>
+        </article>
+        <article class="card">
+          <h3 class="title-lg">Sanni Rusama</h3>
+          <div class="when">Su 9.15</div>
+          <p class="desc">Kantelemusiikkia sunnuntaiaamuun.</p>
+        </article>
+        <article class="card">
+          <h3 class="title-lg">Papipike</h3>
+          <div class="when">Su 13.15</div>
+          <p class="desc">Festarileirin finaalin meininkiä.</p>
+        </article>
+        <article class="card">
+          <h3 class="title-lg">Eetu Airevuo</h3>
+          <div class="when">Su 13.15</div>
+          <p class="desc">Raamattuopetus 5: Ihminen eksyy ja unohtaa, mutta entä Jumala.</p>
+        </article>
+      </div>
+    </section>
+
+    <div class="spacer"></div>
+  </main>
+
+  <script>
+    // Theme handling with localStorage
+    const root = document.documentElement;
+    const checkbox = document.getElementById('themeCheckbox');
+    const savedTheme = localStorage.getItem('theme');
+    function applyTheme(mode){
+      if(mode === 'dark') {
+        root.setAttribute('data-theme','dark');
+        checkbox.checked = true;
+      } else {
+        root.removeAttribute('data-theme');
+        checkbox.checked = false;
+      }
+    }
+    applyTheme(savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+    checkbox.addEventListener('change', () => {
+      const mode = checkbox.checked ? 'dark' : 'light';
+      applyTheme(mode);
+      localStorage.setItem('theme', mode);
+    });
+
+    // Tabs logic
+    const tabs = [
+      {btn: 'btn-perjantai', panel: 'tab-perjantai'},
+      {btn: 'btn-lauantai', panel: 'tab-lauantai'},
+      {btn: 'btn-sunnuntai', panel: 'tab-sunnuntai'},
+      {btn: 'btn-studiot', panel: 'tab-studiot'},
+      {btn: 'btn-workshopit', panel: 'tab-workshopit'},
+      {btn: 'btn-esiintyjat', panel: 'tab-esiintyjat'},
+    ];
+    function activateTab(id){
+      tabs.forEach(t => {
+        const btn = document.getElementById(t.btn);
+        const panel = document.getElementById(t.panel);
+        const isActive = (t.btn === id);
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        panel.classList.toggle('active', isActive);
+      });
+      // Scroll to top of content after tab change on mobile
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    tabs.forEach(t => {
+      document.getElementById(t.btn).addEventListener('click', () => activateTab(t.btn));
+      // Keyboard support
+      document.getElementById(t.btn).addEventListener('keydown', (e) => {
+        const idx = tabs.findIndex(x => x.btn === t.btn);
+        if(['ArrowRight','ArrowLeft','Home','End'].includes(e.key)) e.preventDefault();
+        if(e.key === 'ArrowRight') activateTab(tabs[(idx+1)%tabs.length].btn);
+        if(e.key === 'ArrowLeft') activateTab(tabs[(idx-1+tabs.length)%tabs.length].btn);
+        if(e.key === 'Home') activateTab(tabs[0].btn);
+        if(e.key === 'End') activateTab(tabs[tabs.length-1].btn);
+      });
+    });
+  </script>
+</body>
+</html>
