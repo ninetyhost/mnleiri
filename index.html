@@ -157,7 +157,7 @@
     }
     .tabs-inner {
       max-width: 1100px; margin: 0 auto;
-      display: grid; grid-template-columns: repeat(6, 1fr);
+      display: grid; grid-template-columns: repeat(7, 1fr); /* 7 tabs: Koti + 6 muuta */
       gap: .35rem; padding: .35rem .5rem;
     }
     .tab-btn {
@@ -235,7 +235,7 @@
       * { animation: none!important; transition: none!important; }
     }
 
-    /* --- Esiintyjäkuvien tyyli --- */
+    /* --- Esiintyjäkuvat --- */
     .artist-img {
       width: 100%;
       height: 180px;
@@ -246,11 +246,68 @@
       display: block;
       margin-bottom: .65rem;
     }
-    @media (min-width: 680px){
-      .artist-img { height: 200px; }
+    @media (min-width: 680px){ .artist-img { height: 200px; } }
+    @media (min-width: 1024px){ .artist-img { height: 220px; } }
+
+    /* --- KOTI (etusivu) --- */
+    .hero {
+      background: linear-gradient(180deg, rgba(124,156,255,.12), rgba(96,245,181,.06)), var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1rem;
+      box-shadow: var(--shadow);
+      overflow: hidden;
     }
-    @media (min-width: 1024px){
-      .artist-img { height: 220px; }
+    .hero-topimg {
+      width: 100%;
+      aspect-ratio: 16/6;
+      object-fit: contain;
+      background: var(--surface);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      display: block;
+    }
+    .hero-inner {
+      padding: 1rem .5rem 1.2rem .5rem;
+      text-align: center;
+    }
+    .hero-title {
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      font-weight: 900;
+      letter-spacing: .2px;
+      margin: .6rem 0 .3rem 0;
+    }
+    .hero-sub {
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .hero-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: .6rem;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    @media (min-width: 560px){
+      .hero-actions { grid-template-columns: repeat(2, 1fr); }
+    }
+    .cta {
+      display: inline-flex; align-items: center; justify-content: center; gap: .6rem;
+      padding: .9rem 1rem;
+      font-weight: 900; letter-spacing: .3px;
+      background: linear-gradient(180deg, color-mix(in oklab, var(--brand) 85%, white), color-mix(in oklab, var(--brand-2) 75%, white));
+      color: #081226;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+    .cta:focus-visible { outline: var(--focus); }
+    .cta.secondary {
+      background: color-mix(in oklab, var(--surface) 94%, transparent);
+      color: var(--fg);
+      border-color: var(--border);
     }
   </style>
 </head>
@@ -258,12 +315,12 @@
   <!-- APP BAR -->
   <header class="appbar" role="banner">
     <div class="appbar-inner">
-      <!-- Vasemmalla vain burger (logo/linkki poistettu) -->
+      <!-- Vasemmalla burger -->
       <button class="burger" id="burgerBtn" aria-label="Avaa valikko" aria-expanded="false">
         <span></span>
       </button>
 
-      <!-- Keskellä nimi: brand-badge poistettu -->
+      <!-- Keskellä nimi -->
       <div class="brand" aria-label="Sovelluksen nimi">
         MN LEIRI
       </div>
@@ -291,6 +348,7 @@
       <div class="drawer-content">
         <div class="drawer-section-title">Navigoi</div>
         <div class="drawer-nav">
+          <button class="nav-item" data-tab="btn-koti">🏠 Koti</button>
           <button class="nav-item" data-tab="btn-perjantai">📅 Perjantai <small style="margin-left:auto;">6.3.</small></button>
           <button class="nav-item" data-tab="btn-lauantai">📅 Lauantai <small style="margin-left:auto;">7.3.</small></button>
           <button class="nav-item" data-tab="btn-sunnuntai">📅 Sunnuntai <small style="margin-left:auto;">8.3.</small></button>
@@ -316,7 +374,8 @@
   <!-- DESKTOP TABS -->
   <nav class="tabs" role="tablist" aria-label="Päivät ja osiot">
     <div class="tabs-inner">
-      <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-perjantai" id="btn-perjantai">Perjantai</button>
+      <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-koti" id="btn-koti">Koti</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-perjantai" id="btn-perjantai">Perjantai</button>
       <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-lauantai" id="btn-lauantai">Lauantai</button>
       <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-sunnuntai" id="btn-sunnuntai">Sunnuntai</button>
       <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-studiot" id="btn-studiot">Studiot</button>
@@ -327,8 +386,26 @@
 
   <!-- CONTENT -->
   <main class="container">
+    <!-- KOTI (Etusivu) -->
+    <section class="section active" id="tab-koti" role="tabpanel" aria-labelledby="btn-koti">
+      <div class="hero">
+        <img class="hero-topimg" src="https://maatanakyvissa.fi/wp-content/uploads/2025/06/MN25_herologo.png" alt="Maata Näkyvissä -leirin hero-kuva" loading="eager">
+        <div class="hero-inner">
+          <h1 class="hero-title">Tervetuloa Karkkuun Maata Näkyvissä -leirille 6.–8.2!</h1>
+          <p class="hero-sub">Odotamme sinua 💛</p>
+          <div class="hero-actions">
+            <button class="cta" data-goto="btn-esiintyjat">🎤 Siirry esiintyjiin</button>
+            <button class="cta secondary" data-goto="btn-perjantai">📅 Perjantain ohjelma</button>
+            <button class="cta secondary" data-goto="btn-lauantai">📅 Lauantain ohjelma</button>
+            <button class="cta secondary" data-goto="btn-sunnuntai">📅 Sunnuntain ohjelma</button>
+          </div>
+        </div>
+      </div>
+      <div class="spacer"></div>
+    </section>
+
     <!-- PERJANTAI -->
-    <section class="section active" id="tab-perjantai" role="tabpanel" aria-labelledby="btn-perjantai">
+    <section class="section" id="tab-perjantai" role="tabpanel" aria-labelledby="btn-perjantai">
       <h2 class="sr-only">Perjantai 6.3.</h2>
       <div class="cards">
         <article class="card">
@@ -348,7 +425,7 @@
         <article class="card">
           <div class="when">19.15</div>
           <h3 class="title-lg">Tuutin täydeltä hyviä uutisia</h3>
-          <p class="desc">Ensimmäinen iltamme jatkuu isosti, kun junat ovat löytäneet asemalle ja autot on parkkeerattu pihalle hienosti riviin. Moikataan tutut ja uudet tuttavat sekä noustaan sekunnissa seitsemään sataan kiihtyvään Maata Näkyvissä -festarijunaan. Mukana houseband, festariväki, festarivideot ja yhteistä tutustumista. Nuoren puheenvuoro: Elisa Suopajärvi. Raamattuopetus 1: <em>Jumalan järjestämä pelastusvene informaatiotulvan aallokossa</em> – Antti Koskenniemi.</p>
+          <p class="desc">Ensimmäinen iltamme jatkuu isosti… Nuoren puheenvuoro: Elisa Suopajärvi. Raamattuopetus 1: <em>Jumalan järjestämä pelastusvene informaatiotulvan aallokossa</em> – Antti Koskenniemi.</p>
           <span class="tag">Opetus</span>
         </article>
         <article class="card">
@@ -374,52 +451,26 @@
     <section class="section" id="tab-lauantai" role="tabpanel" aria-labelledby="btn-lauantai">
       <h2 class="sr-only">Lauantai 7.3.</h2>
       <div class="cards">
-        <article class="card">
-          <div class="when">8.00</div>
-          <h3 class="title-lg">Aamupala</h3>
-        </article>
+        <article class="card"><div class="when">8.00</div><h3 class="title-lg">Aamupala</h3></article>
         <article class="card">
           <div class="when">9.00</div>
           <h3 class="title-lg">Valot pimeyksien reunalla</h3>
           <p class="desc">Aamunhartaus: Milka Ikäläinen, nuoren puheenvuoro: Emma Palola. Raamattuopetus 2: <em>Kuinka reunalla uskallan olla ja nojata tuuleen?</em> – Päivi Niemi.</p>
           <span class="tag">Hartaus</span>
         </article>
-        <article class="card">
-          <div class="when">10.45</div>
-          <h3 class="title-lg">Workshopit</h3>
-          <span class="tag">Workshop</span>
-        </article>
-        <article class="card">
-          <div class="when">11.30–12.30</div>
-          <h3 class="title-lg">Lounas</h3>
-        </article>
+        <article class="card"><div class="when">10.45</div><h3 class="title-lg">Workshopit</h3><span class="tag">Workshop</span></article>
+        <article class="card"><div class="when">11.30–12.30</div><h3 class="title-lg">Lounas</h3></article>
         <article class="card">
           <div class="when">12.45</div>
           <h3 class="title-lg">Keskipäivän kotibileet</h3>
-          <p class="desc">Yhteys, ilo ja rauha seurassa, johon ei koskaan pety. Musiikki: Pro Fide. Raamattuopetus 3: <em>Mitä Jeesuksen seurassa kulkeminen antaa ja ottaa?</em> – Tiina Karlsson.</p>
+          <p class="desc">Yhteys, ilo ja rauha… Musiikki: Pro Fide. Raamattuopetus 3: <em>Mitä Jeesuksen seurassa kulkeminen antaa ja ottaa?</em> – Tiina Karlsson.</p>
           <span class="tag">Konsertti</span>
         </article>
-        <article class="card">
-          <div class="when">14.00</div>
-          <h3 class="title-lg">Kahvit ja mehut</h3>
-        </article>
-        <article class="card">
-          <div class="when">14.30</div>
-          <h3 class="title-lg">Studioinfot</h3>
-        </article>
-        <article class="card">
-          <div class="when">14.40</div>
-          <h3 class="title-lg">Studiot</h3>
-          <span class="tag">Studio</span>
-        </article>
-        <article class="card">
-          <div class="when">16.00</div>
-          <h3 class="title-lg">Ihan pihalla – superspesiaali</h3>
-        </article>
-        <article class="card">
-          <div class="when">17.00–18.00</div>
-          <h3 class="title-lg">Päivällinen</h3>
-        </article>
+        <article class="card"><div class="when">14.00</div><h3 class="title-lg">Kahvit ja mehut</h3></article>
+        <article class="card"><div class="when">14.30</div><h3 class="title-lg">Studioinfot</h3></article>
+        <article class="card"><div class="when">14.40</div><h3 class="title-lg">Studiot</h3><span class="tag">Studio</span></article>
+        <article class="card"><div class="when">16.00</div><h3 class="title-lg">Ihan pihalla – superspesiaali</h3></article>
+        <article class="card"><div class="when">17.00–18.00</div><h3 class="title-lg">Päivällinen</h3></article>
         <article class="card">
           <div class="when">18.00</div>
           <h3 class="title-lg">Open stage</h3>
@@ -432,10 +483,7 @@
           <p class="desc">Festaridokkari, parhaat jutut ja sketsit sekä workshoppien satoa. Nuorten puheenvuoro: Veikko Pulakka. Raamattuopetus 4: <em>Miten paljon huomista pitää pelätä?</em> – Juha Heinonen.</p>
           <span class="tag">Gala</span>
         </article>
-        <article class="card">
-          <div class="when">20.30</div>
-          <h3 class="title-lg">Iltapala</h3>
-        </article>
+        <article class="card"><div class="when">20.30</div><h3 class="title-lg">Iltapala</h3></article>
         <article class="card">
           <div class="when">21.30</div>
           <h3 class="title-lg">Kuinka paljon voi kestää</h3>
@@ -445,7 +493,7 @@
         <article class="card">
           <div class="when">23.00</div>
           <h3 class="title-lg">Minä olen sinun kanssasi</h3>
-          <p class="desc">Täydessä salissa ihmisjoukon keskellä joku näkee ja kuulee sinut. Kuulee hiljaiset huokaukset ja ajatuksesi. Hän on mukana myös ilon kiljahduksissa, mutta nyt on aika hiljentyä pitkän päivän päälle. Iltahartaudessa Minttu Gummerus ja houseband.</p>
+          <p class="desc">Täydessä salissa… Iltahartaudessa Minttu Gummerus ja houseband.</p>
           <span class="tag">Hartaus</span>
         </article>
       </div>
@@ -462,23 +510,20 @@
         <article class="card">
           <div class="when">9.15</div>
           <h3 class="title-lg">Tuhansien tuntemusten taukopaikka</h3>
-          <p class="desc">Sunnuntaiaamun rauha tai rauhattomuus, mutta uusi mahdollisuus etsiä, löytää ja nähdä, mitä sisällämme ja ihan vieressä tapahtuu. Aamusessioissa mukana houseband, aamuhartaudessa Maleena Savolainen, nuoren puheenvuorossa Joel Aalto ja musiikissa kanteletaiteilija Sanni Rusama.</p>
+          <p class="desc">Sunnuntaiaamun rauha tai rauhattomuus… Aamusessioissa houseband, aamuhartaudessa Maleena Savolainen, nuoren puheenvuorossa Joel Aalto ja musiikissa kanteletaiteilija Sanni Rusama.</p>
           <span class="tag">Hartaus</span>
         </article>
         <article class="card">
           <div class="when">11.00</div>
           <h3 class="title-lg">Rakkaus tulee kylään</h3>
-          <p class="desc">Sunnuntain jumalanpalveluksessa väsynyt, mutta onnellinen seurakunta kokoontuu yhteen ja antaa Pyhän Hengen hoitaa uskoamme ihmeellisellä tavalla. Ehtoollismessussa saarnaa Samuli Luomaranta ja liturgina Markus Malmivaara.</p>
+          <p class="desc">Ehtoollismessu: saarna Samuli Luomaranta ja liturgina Markus Malmivaara.</p>
           <span class="tag">Messu</span>
         </article>
-        <article class="card">
-          <div class="when">12.30</div>
-          <h3 class="title-lg">Lounas</h3>
-        </article>
+        <article class="card"><div class="when">12.30</div><h3 class="title-lg">Lounas</h3></article>
         <article class="card">
           <div class="when">13.15</div>
           <h3 class="title-lg">Yksi ei hylkää, yksi ei unohda</h3>
-          <p class="desc">Festarileirin kirpparilla liikutaan viimeistä kertaa sydämen ostoskori auki. Kotimatkaa miettiessä voi tulla jo mutkia matkaan, mutta onneksi matkanjohtaja tietää reittimme ja saamme jatkaa valmistetussa askeleissa. Finaalissa Suomen paras Papipike, houseband, viimeiset fiilikset ja infot sekä raamattuopetus 5: <em>Ihminen eksyy ja unohtaa, mutta entä Jumala</em> – Eetu Airevuo.</p>
+          <p class="desc">Finaali: Papipike, houseband, viimeiset fiilikset ja infot sekä raamattuopetus 5: <em>Ihminen eksyy ja unohtaa, mutta entä Jumala</em> – Eetu Airevuo.</p>
           <span class="tag">Finaali</span>
         </article>
       </div>
@@ -554,7 +599,7 @@
       <div class="cards">
 
         <article class="card">
-          <img class="artist-img" loading="lazy" src="https://images.sanoma-sndp.fi/1675b803d023fb3cf6cbd9cddd29c201/normal/978.jpg" alt="Amos – promokuva" width="1200" height="800">
+          <img class="artist-img" src="https://images.sanoma-sndp.fi/1675b803d023fb3cf6cbd9cddd29c201/normal/978.jpg" alt="Amos – promo- tai keikkakuva" loading="lazy">
           <h3 class="title-lg">Amos</h3>
           <div class="when">Pe 21.15</div>
           <p class="desc">Suosittu ja palkittu rap-artisti, joka tuo festarileirille energisen show’n.</p>
@@ -562,7 +607,7 @@
         </article>
 
         <article class="card">
-          <img class="artist-img" loading="lazy" src="https://maatanakyvissa.fi/wp-content/uploads/2025/05/antti-koskenniemi-kuvaaja-lauri-halme5552-scaled.jpg" alt="Antti Koskenniemi – promokuva" width="1707" height="2560">
+          <img class="artist-img" src="https://maatanakyvissa.fi/wp-content/uploads/2025/05/antti-koskenniemi-kuvaaja-lauri-halme5552-scaled.jpg" alt="Antti Koskenniemi – potrettikuva" loading="lazy">
           <h3 class="title-lg">Antti Koskenniemi</h3>
           <div class="when">Pe 19.15</div>
           <p class="desc">Raamattuopetus 1: Jumalan järjestämä pelastusvene informaatiotulvan aallokossa.</p>
@@ -570,7 +615,7 @@
         </article>
 
         <article class="card">
-          <img class="artist-img" loading="lazy" src="https://maatanakyvissa.fi/wp-content/uploads/2024/08/Pro-Fide-Promo-1-scaled.jpg" alt="Pro Fide – promokuva" width="2560" height="1707">
+          <img class="artist-img" src="https://maatanakyvissa.fi/wp-content/uploads/2024/08/Pro-Fide-Promo-1-scaled.jpg" alt="Pro Fide – promokuva" loading="lazy">
           <h3 class="title-lg">Pro Fide</h3>
           <div class="when">La 12.45</div>
           <p class="desc">Ikoninen suomigospelin suunnannäyttäjä; vastaa keskipäivän kotibileiden musiikista.</p>
@@ -578,7 +623,7 @@
         </article>
 
         <article class="card">
-          <img class="artist-img" loading="lazy" src="https://maatanakyvissa.fi/wp-content/uploads/2024/04/Juha-Heinonen-kuva-Arne-Wasse-scaled.jpg" alt="Juha Heinonen – promokuva" width="1707" height="2560">
+          <img class="artist-img" src="https://maatanakyvissa.fi/wp-content/uploads/2024/04/Juha-Heinonen-kuva-Arne-Wasse-scaled.jpg" alt="Juha Heinonen – potrettikuva" loading="lazy">
           <h3 class="title-lg">Juha Heinonen</h3>
           <div class="when">La 19.30</div>
           <p class="desc">Raamattuopetus 4: Miten paljon huomista pitää pelätä?</p>
@@ -586,7 +631,7 @@
         </article>
 
         <article class="card">
-          <img class="artist-img" loading="lazy" src="https://static.wixstatic.com/media/2457cf_0f9bbdfd3c2e4c39bad8ecd34c95083c~mv2.jpg/v1/fill/w_640,h_960,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/2457cf_0f9bbdfd3c2e4c39bad8ecd34c95083c~mv2.jpg" alt="Kotiinpalaajat – promokuva" width="640" height="960">
+          <img class="artist-img" src="https://static.wixstatic.com/media/2457cf_0f9bbdfd3c2e4c39bad8ecd34c95083c~mv2.jpg/v1/fill/w_640,h_960,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/2457cf_0f9bbdfd3c2e4c39bad8ecd34c95083c~mv2.jpg" alt="Kotiinpalaajat – promokuva" loading="lazy">
           <h3 class="title-lg">Kotiinpalaajat</h3>
           <div class="when">La 21.30</div>
           <p class="desc">Rokkimeininkiä lauantain iltagaalassa – energinen live-kokemus.</p>
@@ -594,14 +639,14 @@
         </article>
 
         <article class="card">
-          <img class="artist-img" loading="lazy" src="https://www.klangi.fi/wp-content/uploads/2022/10/PapiPike-Camaan-Hayley-2022-Klangi.jpg" alt="Papipike – promokuva" width="1200" height="800">
+          <img class="artist-img" src="https://www.klangi.fi/wp-content/uploads/2022/10/PapiPike-Camaan-Hayley-2022-Klangi.jpg" alt="Papipike – promokuva" loading="lazy">
           <h3 class="title-lg">Papipike</h3>
           <div class="when">Su 13.15</div>
           <p class="desc">Festarileirin finaalin show: näyttävä päätös ja yhteinen huipennus.</p>
           <span class="tag">Show</span>
         </article>
 
-        <!-- Muut esiintyjät (ilman kuvia toistaiseksi) -->
+        <!-- Muut esiintyjät (toistaiseksi ilman kuvia) -->
         <article class="card">
           <h3 class="title-lg">Päivi Niemi</h3>
           <div class="when">La 9.00</div>
@@ -643,7 +688,7 @@
     <div class="spacer"></div>
   </main>
 
-  <!-- TAKaisin ylös -nappi -->
+  <!-- Takaisin ylös -nappi -->
   <button id="fabTop" aria-label="Ylös">↑</button>
 
   <script>
@@ -668,6 +713,7 @@
 
     // ---------- TABS ----------
     const tabs = [
+      {btn: 'btn-koti', panel: 'tab-koti'},
       {btn: 'btn-perjantai', panel: 'tab-perjantai'},
       {btn: 'btn-lauantai', panel: 'tab-lauantai'},
       {btn: 'btn-sunnuntai', panel: 'tab-sunnuntai'},
@@ -676,6 +722,7 @@
       {btn: 'btn-esiintyjat', panel: 'tab-esiintyjat'},
     ];
     const tabToHash = {
+      'btn-koti':'#koti',
       'btn-perjantai':'#perjantai',
       'btn-lauantai':'#lauantai',
       'btn-sunnuntai':'#sunnuntai',
@@ -713,6 +760,7 @@
 
     // Hash deep-link
     const hashMap = {
+      '#koti':'btn-koti',
       '#perjantai':'btn-perjantai',
       '#lauantai':'btn-lauantai',
       '#sunnuntai':'btn-sunnuntai',
@@ -768,7 +816,15 @@
       closeDrawer();
     });
 
-    // ---------- TAKaisin ylös -FAB ----------
+    // ---------- KOTI Hero CTA:t ----------
+    document.querySelectorAll('[data-goto]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const id = btn.getAttribute('data-goto');
+        activateTab(id);
+      });
+    });
+
+    // ---------- Takaisin ylös -FAB ----------
     const fabTop = document.getElementById('fabTop');
     function toggleFab(){
       fabTop.style.display = window.scrollY > 600 ? 'inline-flex' : 'none';
