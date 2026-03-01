@@ -69,30 +69,10 @@
       max-width: 1100px; margin: 0 auto; padding: .7rem 1rem;
     }
 
-    /* ---- Keokarkun logo vasempaan yläkulmaan ---- */
-    .left-start {
-      display: inline-flex; align-items: center; gap: .6rem;
-    }
-    .kk-logo {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 34px; height: 34px; border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      box-shadow: var(--shadow);
-      text-decoration: none;
-    }
-    .kk-logo svg { width: 24px; height: 24px; }
-    .kk-logo:focus-visible { outline: var(--focus); }
-
     .brand {
       display: inline-flex; align-items: center; gap: .6rem;
       font-weight: 800; letter-spacing: .4px; font-size: 1.05rem;
       text-transform: uppercase;
-    }
-    .brand-badge {
-      width: 26px; height: 26px; border-radius: 7px;
-      background: conic-gradient(from 200deg, var(--brand), var(--brand-2), var(--brand-3), var(--brand));
-      box-shadow: inset 0 0 0 2px rgba(255,255,255,.15), 0 6px 18px rgba(0,0,0,.35);
     }
 
     /* Theme & burger */
@@ -250,6 +230,7 @@
       box-shadow: var(--shadow); cursor: pointer; font-weight: 900; font-size: 20px;
     }
     #fabTop:focus-visible { outline: var(--focus); }
+
     @media (prefers-reduced-motion: reduce){
       * { animation: none!important; transition: none!important; }
     }
@@ -259,31 +240,13 @@
   <!-- APP BAR -->
   <header class="appbar" role="banner">
     <div class="appbar-inner">
-      <div class="left-start">
-        <!-- Keokarkun logo vasempaan yläkulmaan -->
-        <a class="kk-logo" href="https://www.keokarkku.fi/" target="_blank" rel="noopener" aria-label="Keokarkku">
-          <!-- Inline-SVG placeholder logo (vaihda tarvittaessa omaan kuvaan) -->
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <defs>
-              <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
-                <stop offset="0" stop-color="#7c9cff"/>
-                <stop offset="1" stop-color="#60f5b5"/>
-              </linearGradient>
-            </defs>
-            <circle cx="12" cy="12" r="10" stroke="url(#g1)" stroke-width="2" fill="none"></circle>
-            <path d="M7 15l5-6 5 6" stroke="url(#g1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <!-- Jos sinulla on oikea logo:
-               <img src="logo-keokarkku.png" alt="Keokarkku" width="24" height="24" loading="lazy"> -->
-        </a>
-        <!-- Burger-nappi heti logon vieressä -->
-        <button class="burger" id="burgerBtn" aria-label="Avaa valikko" aria-expanded="false">
-          <span></span>
-        </button>
-      </div>
+      <!-- Vasemmalla nyt vain burger (logo/linkki poistettu) -->
+      <button class="burger" id="burgerBtn" aria-label="Avaa valikko" aria-expanded="false">
+        <span></span>
+      </button>
 
+      <!-- Keskellä nimi: poistettu pieni neliö (brand-badge) -->
       <div class="brand" aria-label="Sovelluksen nimi">
-        <div class="brand-badge" aria-hidden="true"></div>
         MN LEIRI
       </div>
 
@@ -324,7 +287,7 @@
           <button class="chip-ghost" id="goTop">⤴️ Ylös</button>
         </div>
 
-        <!-- UUSI hyperlinkki burgeriin -->
+        <!-- Jätetty aiemmin lisätty hyperlinkki tänne (burgeriin) -->
         <a class="drawer-link" href="https://www.keokarkku.fi/leirit-ja-kurssit/maata-nakyvissa-leiri/" target="_blank" rel="noopener">
           🔗 Keokarkku – Maata Näkyvissä -leiri
         </a>
@@ -344,7 +307,7 @@
     </div>
   </nav>
 
-  <!-- CONTENT (lyhennetty – sama sisältö kuin aiemmin, ei muutoksia ohjelmatekstiin) -->
+  <!-- CONTENT (sama ohjelmasisältö kuin aiemmin) -->
   <main class="container">
     <!-- PERJANTAI -->
     <section class="section active" id="tab-perjantai" role="tabpanel" aria-labelledby="btn-perjantai">
@@ -535,7 +498,6 @@
       drawer.classList.add('open');
       drawer.setAttribute('aria-hidden','false');
       burgerBtn.setAttribute('aria-expanded','true');
-      // Siirrä fokus dialogiin
       setTimeout(()=>drawer.querySelector('.nav-item')?.focus(), 10);
     }
     function closeDrawer(){
